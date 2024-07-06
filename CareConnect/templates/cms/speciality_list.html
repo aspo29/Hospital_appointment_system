@@ -1,0 +1,75 @@
+{% extends 'cms/base.html' %}
+
+{% block title %}Specialty List - Care Connect{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Specialty List</h2>
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    <table class="table table-hover table-striped table-bordered align-middle tablemanager">
+        <thead class="thead-dark">
+            <tr>
+                <th>Specialty ID</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Original Price</th>
+                <th>Discounted Price</th>
+                <th>Discount (%)</th>
+                <th>Image</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for specialty in specialties %}
+            <tr>
+                <td>{{ specialty.id }}</td>
+                <td>{{ specialty.name }}</td>
+                <td>{{ specialty.description }}</td>
+                <td>{{ specialty.original_price }}</td>
+                <td>{{ specialty.discounted_price }}</td>
+                <td>{{ specialty.discount }}</td>
+                <td><img src="{{ specialty.image.url }}" height="100" width="100"></td>
+                <td>
+                    <!-- Edit button -->
+                    <a href="{% url 'update_specialty' specialty.id %}" class="btn btn-primary mb-2">Edit</a>
+                    <!-- Button to trigger delete confirmation modal -->
+                    <button class="btn btn-danger" data-toggle="modal"
+                        data-target="#deleteModal{{ specialty.id }}">Delete</button>
+                    <!-- Delete confirmation modal -->
+                    <div class="modal fade" id="deleteModal{{ specialty.id }}" tabindex="-1" role="dialog"
+                        aria-labelledby="deleteModalLabel{{ specialty.id }}" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="deleteModalLabel{{ specialty.id }}">Delete Specialty
+                                    </h5>
+                                    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close">
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to delete {{ specialty.name }}?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                    <!-- Form to submit deletion -->
+                                    <form action="{% url 'delete_specialty' specialty.id %}" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

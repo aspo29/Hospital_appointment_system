@@ -1,0 +1,14 @@
+{% extends 'cms/base.html' %}
+
+{% block title %}Add Appointment - Care Connect{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="mb-4">Add Appointment</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Add Appointment</button>
+    </form>
+</div>
+{% endblock %}

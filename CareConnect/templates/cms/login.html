@@ -1,0 +1,46 @@
+{% extends 'cms/base.html' %}
+
+{% block title %}Login - Care Connect{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  {% if messages %}
+  {% for message in messages %}
+  <div
+    class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %} alert-dismissible fade show"
+    role="alert">
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+  {% endfor %}
+  {% endif %}
+  <h1>Login</h1>
+  <form action="{% url 'login' %}{% if next %}?next={{ next|urlencode }}{% endif %}" method="POST">
+    {% csrf_token %}
+    <!-- <div class="mb-3">
+      <label for="username" class="form-label">Username</label>
+      <input type="text" class="form-control" id="username" name="username" required>
+    </div>
+    <div class="mb-3">
+      <label for="password" class="form-label">Password</label>
+      <input type="password" class="form-control" id="password" name="password" required>
+    </div>
+    {% if error %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      {{ error }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+    <button type="submit" class="btn btn-primary">Login</button>
+  </form>
+</div> -->
+    {{ form.as_p }}
+    {% if error %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      {{ error }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+    <button type="submit" class="btn btn-primary">Login</button>
+  </form>
+  {% endblock %}

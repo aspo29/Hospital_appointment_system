@@ -1,0 +1,15 @@
+{% extends 'cms/base.html' %}
+
+{% block title %}Update Specialty - Care Connect{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="mb-4">Update Specialty</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a href="{% url 'specialty_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

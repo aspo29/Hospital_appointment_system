@@ -1,0 +1,4 @@
+<option value="" disabled>Select a speciality</option>
+{% for specialty in specialties %}
+<option value="{{ specialty.id }}">{{ specialty.name }}</option>
+{% endfor %}

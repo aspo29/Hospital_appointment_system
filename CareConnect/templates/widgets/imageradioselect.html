@@ -1,0 +1,17 @@
+<!-- {% load static %}
+<div class="form-group">
+    {% for group, options, index in widget.optgroups %}
+    {% for option in options %}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="{{ widget.name }}"
+            id="{{ widget.attrs.id }}_{{ forloop.counter }}" value="{{ option.value }}" {% if option.selected %}
+            checked{% endif %}>
+        <label class="form-check-label" for="{{ widget.attrs.id }}_{{ forloop.counter }}">
+            <img src="{% static 'img/' %}{{ option.value }}.png" alt="{{ option.label }}"  class="img-fluid rounded-circle"
+                style="width: 30px; height: 30px;">
+            {{ option.label }}
+        </label>
+    </div>
+    {% endfor %}
+    {% endfor %}
+</div> -->

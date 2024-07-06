@@ -1,0 +1,73 @@
+{% extends 'cms/base.html' %}
+
+{% block title %}Patient List - Care Connect{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="mb-4">Patient List</h2>
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    <table class="table table-hover table-striped table-bordered align-middle tablemanager">
+        <thead class="thead-dark">
+            <tr>
+                <th>Patient ID</th>
+                <th>Name</th>
+                <th>Age</th>
+                <th>Gender</th>
+                <th>Mobile</th>
+                <th>Address</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for patient in patients %}
+            <tr>
+                <td>{{ patient.id }}</td>
+                <td>{{ patient.name }}</td>
+                <td>{{ patient.age }}</td>
+                <td>{{ patient.gender }}</td>
+                <td>{{ patient.mobile }}</td>
+                <td>{{ patient.address }}</td>
+                <td>
+                    <!-- Edit button -->
+                    <a href="{% url 'update_patient' patient.id %}" class="btn btn-primary">Edit</a>
+                    <!-- Button to trigger delete confirmation modal -->
+                    <button class="btn btn-danger" data-toggle="modal"
+                        data-target="#deleteModal{{ patient.id }}">Delete</button>
+                    <!-- Delete confirmation modal -->
+                    <div class="modal fade" id="deleteModal{{ patient.id }}" tabindex="-1" role="dialog"
+                        aria-labelledby="deleteModalLabel{{ patient.id }}" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="deleteModalLabel{{ patient.id }}">Delete Patient</h5>
+                                    <button type="button" class="btn-close" data-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to delete {{ patient.name }}?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                    <!-- Form to submit deletion -->
+                                    <form action="{% url 'delete_patient' patient.id %}" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

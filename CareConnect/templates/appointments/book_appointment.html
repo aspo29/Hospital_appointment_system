@@ -1,0 +1,136 @@
+{% extends 'cms/base.html' %}
+{% load static %}
+{% block title %}Book Appointment - Care Connect{% endblock %}
+
+{% block content %}
+<div class="container my-5 p-4 shadow-lg rounded-4">
+    {% if messages %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {% for message in messages %}
+        {{ message }}
+        {% endfor %}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+    <h2 class="text-center text-primary my-4 text-shadow">BOOK YOUR APPOINTMENT</h2>
+
+    <!-- Patient Information Form -->
+    <form method="post" action="{% url 'book_appointment' %}" class="row g-3">
+        {% csrf_token %}
+        <h3 class="my-2 text-success">Patient Information</h3>
+
+        <div class="col-md-12">
+            {{ patient_form.name.label_tag }}
+            {{ patient_form.name }}
+        </div>
+
+        <div class="col-md-6">
+            {{ patient_form.age.label_tag }}
+            {{ patient_form.age }}
+        </div>
+        <div class="col-md-6">
+            {{ patient_form.gender.label_tag }}
+            {{ patient_form.gender }}
+        </div>
+
+        <div class="col-md-6">
+            {{ patient_form.mobile.label_tag }}
+            {{ patient_form.mobile }}
+        </div>
+        <div class="col-md-6 mb-4">
+            {{ patient_form.address.label_tag }}
+            {{ patient_form.address }}
+        </div>
+
+        <hr class="my-4">
+        <h3 class="text-success my-2">Appointment Information</h3>
+
+        <div class="col-md-6">
+            {{ appointment_form.doctor.label_tag }}
+            {{ appointment_form.doctor }}
+        </div>
+
+        <div class="col-md-6">
+            {{ appointment_form.specialty.label_tag }}
+            {{ appointment_form.specialty }}
+        </div>
+
+        <div class="col-md-6">
+            {{ appointment_form.appointment_date.label_tag }}
+            <div class="input-group">
+                {{ appointment_form.appointment_date }}
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            {{ appointment_form.appointment_time.label_tag }}
+            {{ appointment_form.appointment_time }}
+        </div>
+
+        <div class="col-md-12">
+            <label for="symptom_description">{{ appointment_form.symptom_description.label_tag }}</label><br>
+            {{ appointment_form.symptom_description }}
+        </div>
+        <hr class="my-4">
+
+        <h3 class="text-success my-3">Payment Information</h3>
+
+        <div class="container mt-3">
+            <div class="col-md-12 mb-4">
+                <label for="payment_method" class="form-label">Select Payment Method:</label>
+                {% for value, label in appointment_form.payment_method.field.choices %}
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" id="{{ value }}"
+                        name="{{ appointment_form.payment_method.name }}" value="{{ value }}">
+                    <label class="form-check-label" for="{{ value }}">
+                        <img src="{% static 'img/' %}{{ value }}.png" alt="{{ label }}" class="img-fluid rounded-circle"
+                            style="width: 30px; height: 30px;">
+                        {{ label }}
+                    </label>
+                </div>
+                {% endfor %}
+                <!-- <p>{{ appointment_form.payment_method }}</p> -->
+                <!-- <div class="form-check">
+                    <input class="form-check-input" type="radio" id="fonepay" name="payment_method" value="fonepay"
+                        required>
+                    <label class="form-check-label" for="fonepay">
+                        <img src="{% static 'img/fonepay.png' %}" alt="FonePay">
+                        FonePay
+                    </label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" id="khalti" name="payment_method" value="khalti"
+                        required>
+                    <label class="form-check-label" for="khalti">
+                        <img src="{% static 'img/khalti.png' %}" alt="Khalti">
+                        Khalti
+                    </label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" id="hbl" name="payment_method" value="hbl" required>
+                    <label class="form-check-label" for="hbl">
+                        <img src="{% static 'img/hbl.png' %}" alt="HBL">
+                        HBL
+                    </label>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" id="esewa" name="payment_method" value="esewa"
+                        required>
+                    <label class="form-check-label" for="esewa">
+                        <img src="{% static 'img/esewa.png' %}" alt="eSewa">
+                        eSewa
+                    </label>
+                </div> -->
+            </div>
+        </div>
+
+        <div class="col-md-12 d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">Book Appointment</button>
+            <a href="{% url 'book_another_appointment' %}" class="btn btn-secondary">Make Another Appointment</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends 'cms/base.html' %}
+
+{% block title %}Appointment Successfully Booked - Care Connect{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    {% if messages %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {% for message in messages %}
+        {{ message }}
+        {% endfor %}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="text-center">
+                <div class="rounded-circle bg-primary d-flex justify-content-center align-items-center mx-auto"
+                    style="width: 120px; height: 120px;">
+                    <i class="material-icons text-white" style="font-size: 48px;">&#xE876;</i>
+                </div>
+                <h1 class="mt-3">Appointment Successfully Booked!</h1>
+                <p class="lead">Thank you for booking your appointment with us.</p>
+                {% if appointment %}
+                <p>Your appointment is booked with <b style="font-weight: bold;">{{appointment.doctor.name }}</b> <br>on <b style="font-weight: bold;">{{ appointment.appointment_date }}</b> between <b style="font-weight: bold;">{{ appointment.time }}</b></p>
+                {% endif %}
+            </div>
+            <div class="text-center mt-5">
+                <form action="{% url 'ticket' %}" method="post" target="_blank">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">Download Ticket</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

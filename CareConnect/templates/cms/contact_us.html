@@ -1,0 +1,87 @@
+{% extends 'cms/base.html' %}
+
+{% block title %}Contact Us - Care Connect{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center">Contact Us</h1>
+    <form action="{% url 'contact_us' %}" method="post">
+        <div class="row mb-3">
+            <div class="col-md-12">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-12">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-12">
+                <label for="subject" class="form-label">Subject</label>
+                <input type="text" class="form-control" id="subject" name="subject" required>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-12">
+                <label for="message" class="form-label">Message</label>
+                <textarea class="form-control" id="message" name="message" rows="4" required></textarea>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-12">
+                <div class="g-recaptcha" data-sitekey="YOUR_SITE_KEY">
+                    <!-- Your reCAPTCHA code goes here -->
+                </div>
+                <label id="captcha" class="error"></label>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-12 text-center">
+                <button type="submit" class="btn btn-primary btn-block">Submit</button>
+            </div>
+        </div>
+    </form>
+</div>
+<br>
+<section class="contact-us pt-40 pb-100 my-3">
+    <div class="container">
+        <h1 class="text-center">Contact Info</h1>
+        <div class="row mt-5 text-center">
+            <div class="col-lg-3 col-sm-6 mb-4">
+                <div class="contact-box p-4 shadow-sm rounded bg-white">
+                    <h4><i class="fas fa-phone-square"></i> Contact</h4>
+                    <p class="text-danger font-weight-bold mt-3">
+                        <a href="tel:+9779812345678">+977-9812345678</a>
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-sm-6 mb-4">
+                <div class="contact-box p-4 shadow-sm rounded bg-white">
+                    <h4><i class="fa fa-envelope"></i> Send Email</h4>
+                    <p class="font-weight-bold mt-3">
+                        <a href="mailto:abc@gmail.com">abc@gmail.com</a>
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-sm-6 mb-4">
+                <div class="contact-box p-4 shadow-sm rounded bg-white">
+                    <h4><i class="fa fa-address-card" aria-hidden="true"></i> Office Address</h4>
+                    <p class="font-weight-bold mt-3">
+                        <a href="http://maps.google.com/maps?q=bijaypur">bijaypur, Pokhara</a>
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-sm-6 mb-4">
+                <div class="contact-box p-4 shadow-sm rounded bg-white">
+                    <h4><i class="fa fa-address-card" aria-hidden="true"></i> Office Time</h4>
+                    <p class="font-weight-bold mt-3">10AM to 5PM</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends 'cms/base.html' %}
+
+{% block title %}Admin Home - Care Connect{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    {% if messages %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {% for message in messages %}
+        {{ message }}
+        {% endfor %}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+    <h1>Welcome, Admin!</h1>
+    <div class="row mt-5">
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title"><a href="{% url 'doctor_list' %}" class="text-decoration-none">Doctors <span
+                                class="badge rounded-pill bg-primary">{{ doctor_count }}</span></a></h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title"><a href="{% url 'patient_list' %}" class="text-decoration-none">Patients
+                            <span class="badge rounded-pill bg-success">{{ patient_count }}</span></a></h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title"><a href="{% url 'specialty_list' %}"
+                            class="text-decoration-none">Specialities <span class="badge rounded-pill bg-info">
+                                {{ speciality_count}}</span></a></h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title"><a href="{% url 'appointment_list' %}"
+                            class="text-decoration-none">Appointments <span class="badge rounded-pill bg-warning">
+                                {{ appointment_count }}</span></a></h5>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

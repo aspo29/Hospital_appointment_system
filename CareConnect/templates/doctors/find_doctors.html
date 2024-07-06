@@ -1,0 +1,69 @@
+<!-- find_doctors.html -->
+{% extends 'cms/base.html' %}
+
+{% block title %}Find Doctors - Care Connect{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1>Find Doctors</h1>
+    <form action="{% url 'find_doctors' %}" method="GET" class="mb-4">
+        {% csrf_token %}
+        <div class="input-group mb-3">
+            <div class="col me-2">
+                <input type="text" id="search-query" class="form-control" placeholder="Search for doctors">
+            </div>
+            <div class="col-auto">
+                <button type="submit" id="search-button" class="btn btn-primary">Search</button>
+            </div>
+        </div>
+    </form>
+    <section class="container">
+        <div class="row owl-carousel owl-theme">
+            {% for doc in doctors %}
+            <div class="col-md-4 mb-4">
+                <div class="card shadow">
+                    {% if doc.image %}
+                    <img src="{{ doc.image.url }}" height="400px" class="card-img-top" alt="">
+                    {% else %}
+                    <img src="/static/img/placeholder.jpg" height="400px" class="card-img-top" alt="">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ doc.name }}</h5>
+                        <p class="card-text">{{ doc.profession }}</p>
+                        {% if request.user.is_authenticated or request.user.is_staff %}
+                        <a href="{% url 'book_appointment' %}?doctor_id={{ doc.id }}&speciality_id={{ doc.profession.speciality.id }}"
+                            class="btn btn-primary">Book Appointment</a>
+                        {% else %}
+                        <a href="{% url 'login' %}?next={% url 'book_appointment' %}%3Fdoctor_id%3D{{ doc.id }}%26speciality_id%3D{{ doc.profession.speciality.id }}"
+                            class="btn btn-primary" onclick="alert('Please login or register to book appointment.')">
+                            Login to Book</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+<script>
+    function searchCards(event) {
+        event.preventDefault();// Prevent form submission
+        var query = document.getElementById('search-query').value.trim().toLowerCase();
+        var cards = document.querySelectorAll('.col-md-4.mb-4');
+
+        cards.forEach(function (card) {
+            var title = card.querySelector('.card-title').innerText.trim().toLowerCase();
+            var text = card.querySelector('.card-text').innerText.trim().toLowerCase();
+
+            if (title.includes(query) || text.includes(query)) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    document.getElementById('search-button').addEventListener('click', searchCards);
+    //document.getElementById('search-query').addEventListener('keyup', searchCards);
+</script>
+{% endblock %}
