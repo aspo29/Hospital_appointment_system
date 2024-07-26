@@ -15,21 +15,18 @@
     <div class="col-md-12">
       <div id="myCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
         <div class="carousel-indicators">
-          <button type="button" data-bs-target="#carousel" data-bs-slide-to="0" class="active"
-            aria-current="true"></button>
-          <button type="button" data-bs-target="#carousel" data-bs-slide-to="1"></button>
-          <button type="button" data-bs-target="#carousel" data-bs-slide-to="2"></button>
+          {% for image in carousel_images %}
+          <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="{{ forloop.counter0 }}"
+            class="{% if forloop.first %}active{% endif %}"
+            aria-current="{% if forloop.first %}true{% endif %}"></button>
+          {% endfor %}
         </div>
         <div class="carousel-inner rounded-2">
-          <div class="carousel-item active" data-bs-interval="4000">
-            <img src="/static/img/slider1.png" class=" d-block w-100" alt="">
+          {% for image in carousel_images %}
+          <div class="carousel-item {% if forloop.first %}active{% endif %}" data-bs-interval="{{ image.interval }}">
+            <img src="{{ image.image.url }}" class="d-block w-100" alt="">
           </div>
-          <div class="carousel-item" data-bs-interval="4000">
-            <img src="/static/img/Doctors-Talking-GettyImages.jpg" class="d-block w-100 " alt="">
-          </div>
-          <div class="carousel-item" data-bs-interval="4000">
-            <img src="/static/img/Three-Doctors-Walking-Down-the-Corridor-1200X628.jpg" class=" d-block w-100" alt="">
-          </div>
+          {% endfor %}
         </div>
 
         <button class="carousel-control-prev" type="button" data-bs-target="#myCarousel" data-bs-slide="prev">
@@ -83,100 +80,23 @@
       </div>
     </div>
     <div class="row">
+      {% for service in services %}
       <div class="col-md-4 mb-4">
         <div class="card shadow">
-          <img src="/static/img/10.jpeg" height="270px" class="card-img-top" alt="Emergency">
+          <img src="{{ service.image.url }}" height="270px" class="card-img-top" alt="{{ service.name }}">
           <div class="card-body">
-            <span class="badge bg-danger">Immediate Care</span>
-            <h5 class="card-title">Emergency</h5>
-            <p class="card-text">24/7 emergency services for urgent medical needs.</p>
+            <span class="badge bg-{{ service.badge }}">{{ service.discount }}% OFF</span>
+            <h5 class="card-title">{{ service.name }}</h5>
+            <p class="card-text">{{ service.description }}</p>
             <p class="card-text">
-              No additional charges
+              <small class="text-muted text-decoration-line-through">Rs. {{ service.original_price }}</small>
+              Rs. {{ service.discounted_price }}
             </p>
-            <a href="http://www.emergency.com/" class="btn btn-primary">Contact Now</a>
+            <a href="{{ service.url }}" class="btn btn-primary">Book Now</a>
           </div>
         </div>
       </div>
-      <div class="col-md-4 mb-4">
-        <div class="card shadow">
-          <img src="/static/img/11.jpeg" height="270px" class="card-img-top" alt="Pharmacy">
-          <div class="card-body">
-            <span class="badge bg-primary">10% OFF</span>
-            <h5 class="card-title">Pharmacy</h5>
-            <p class="card-text">Wide range of medications and health products.</p>
-            <p class="card-text">
-              <small class="text-muted text-decoration-line-through">Rs. 1500.00</small>
-              Rs. 1350.00
-            </p>
-            <a href="https://pharmacynepal.com/" class="btn btn-primary">Shop Now</a>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4 mb-4">
-        <div class="card shadow">
-          <img src="/static/img/12.jpeg" height="270px" class="card-img-top" alt="USG">
-          <div class="card-body">
-            <span class="badge bg-secondary">20% OFF</span>
-            <h5 class="card-title">USG</h5>
-            <p class="card-text">High-quality ultrasound services for various needs.</p>
-            <p class="card-text">
-              <small class="text-muted text-decoration-line-through">Rs. 2000.00</small>
-              Rs. 1600.00
-            </p>
-            <a href="https://www.portea.com/labs/diagnostic-tests/ultrasound-sonography-test-usg-abdominal-pelvic-116/"
-              class="btn btn-primary">Book Now</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="container">
-    <div class="row">
-      <div class="col-md-4 mb-4">
-        <div class="card shadow">
-          <img src="/static/img/16.jpeg" height="270px" class="card-img-top" alt="Lab">
-          <div class="card-body">
-            <span class="badge bg-danger">10% OFF</span>
-            <h5 class="card-title">Lab</h5>
-            <p class="card-text">Laboratory services offer a range of tests crucial for accurate diagnostics.</p>
-            <p class="card-text">
-              <small class="text-muted text-decoration-line-through">Rs. 1500.00</small>
-              Rs. 1350.00
-            </p>
-            <a href="https://www.golabz.eu/labs" class="btn btn-primary">Book Now</a>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4 mb-4">
-        <div class="card shadow">
-          <img src="/static/img/14.jpeg" height="270px" class="card-img-top" alt="ECHO Services">
-          <div class="card-body">
-            <span class="badge bg-primary">20% OFF</span>
-            <h5 class="card-title">ECHO Services</h5>
-            <p class="card-text">Advanced echocardiography for heart health assessment.</p>
-            <p class="card-text">
-              <small class="text-muted text-decoration-line-through">Rs. 3500.00</small>
-              Rs. 2800.00
-            </p>
-            <a href="https://www.pathkindlabs.com/diagnostic/2-d-echo" class="btn btn-primary">Book Now</a>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4 mb-4">
-        <div class="card shadow">
-          <img src="/static/img/9.jpeg" height="270px" class="card-img-top" alt="Digital X-Ray">
-          <div class="card-body">
-            <span class="badge bg-success">30% OFF</span>
-            <h5 class="card-title">Digital X-Ray</h5>
-            <p class="card-text">High-resolution digital imaging for accurate diagnosis.</p>
-            <p class="card-text">
-              <small class="text-muted text-decoration-line-through">Rs. 2000.00</small>
-              Rs. 1400.00
-            </p>
-            <a href="https://nitapolyclinic.com.np/service/digital-x-ray" class="btn btn-primary">Book Now</a>
-          </div>
-        </div>
-      </div>
+      {% endfor %}
     </div>
   </div>
 </section>

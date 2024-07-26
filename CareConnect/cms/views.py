@@ -5,7 +5,7 @@ from django.contrib import messages
 from .forms import LoginForm ,RegistrationForm ,SpecialityForm 
 from django.contrib.auth.models import User
 import time
-from .models import Speciality 
+from .models import Speciality ,MedicalService ,CarouselImage , StaticFile
 from appointments.models import Appointment
 from doctors.models import Doctor
 from patients.models import Patient
@@ -41,7 +41,15 @@ class HomeView(TemplateView):
 
 def index(request):
     specialities = Speciality.objects.all()
-    return render(request, 'index.html', {'specialities': specialities})
+    services = MedicalService.objects.all()
+    carousel_images = CarouselImage.objects.all()
+    logo = StaticFile.objects.filter(name='logo').first()
+    return render(request, 'index.html', {
+        'specialities': specialities,
+        'services': services,
+        'carousel_images': carousel_images,
+        'logo': logo,
+    })
 
 def contact_us(request):
     return render(request, 'cms/contact_us.html')

@@ -25,7 +25,9 @@
         <nav class="navbar navbar-expand-lg navbar-light bg-light ">
             <div class="container">
                 <a class="navbar-brand" href="/">
-                    <img src="{% static 'img/logo.png' %}" alt="केयरकनेक्ट" style="height: 38px;">
+                    {% if logo %}
+                    <img src="{{ logo.image.url }}" alt="केयरकनेक्ट" style="height: 38px;">
+                    {% endif %}
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas"
                     data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
@@ -196,11 +198,15 @@
                     <div class="location">
                         <h2>Location</h2>
                         <ul class="list-unstyled" id="list">
-                            <li><a href="#" class="text-white"><i class="fas fa-map-marker-alt"></i> Bijaypur, Pokhara Nepal</a></li>
-                            <li><a href="mailto:careconnect@gmail.com" class="text-white"><i class="fas fa-envelope"></i> careconnect@gmail.com</a>
+                            <li><a href="#" class="text-white"><i class="fas fa-map-marker-alt"></i> Bijaypur, Pokhara
+                                    Nepal</a></li>
+                            <li><a href="mailto:careconnect@gmail.com" class="text-white"><i
+                                        class="fas fa-envelope"></i> careconnect@gmail.com</a>
                             </li>
-                            <li><a href="tel:9842398981" class="text-white"><i class="fas fa-phone"></i> +9779842398981</a></li>
-                            <li><a href="tel:9834319898" class="text-white"><i class="fas fa-phone"></i> +9779834319898</a></li>
+                            <li><a href="tel:9842398981" class="text-white"><i class="fas fa-phone"></i>
+                                    +9779842398981</a></li>
+                            <li><a href="tel:9834319898" class="text-white"><i class="fas fa-phone"></i>
+                                    +9779834319898</a></li>
                         </ul>
                     </div>
                 </div>
