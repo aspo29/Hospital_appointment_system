@@ -25,6 +25,8 @@ urlpatterns = [
     path('appointments/', include('appointments.urls')),
     path('doctors/', include('doctors.urls')),
     path('patients/', include('patients.urls')),
+    path('profiles/', include('profiles.urls')),
 ]
 # Serve media files during development
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

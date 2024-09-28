@@ -3,7 +3,6 @@ from .forms import DoctorForm
 from .models import Doctor 
 from cms.models import Speciality
 from django.contrib import messages
-# Create your views here.
 
 def find_doctors(request, speciality_id=None):
     if speciality_id:
@@ -11,16 +10,18 @@ def find_doctors(request, speciality_id=None):
         doctors = Doctor.objects.filter(profession__speciality=speciality)
     else:
         doctors = Doctor.objects.all()
-    
+
     is_authenticated = request.user.is_authenticated
     is_staff = request.user.is_staff
-    
+    has_appointment = request.session.get('appointment_id') is not None  # Check for existing appointment
+
     return render(request, 'doctors/find_doctors.html', {
-        'doctors': doctors, 
+        'doctors': doctors,
         'selected_speciality_id': speciality_id,
         'is_authenticated': is_authenticated,
-        'is_staff': is_staff,})
-
+        'is_staff': is_staff,
+        'has_appointment': has_appointment,  # Pass this variable to the template
+    })
 
 # Doctor views
 def doctor_list(request):

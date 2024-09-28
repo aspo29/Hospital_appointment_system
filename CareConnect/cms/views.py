@@ -70,12 +70,14 @@ def login(request):
             if user is not None:
                 auth_login(request, user)
                 messages.success(request, 'Login successful!')
+                
+                # Redirect based on user type (staff or non-staff)
                 if next_url:
                     return redirect(next_url)  # Redirect to the next URL if it exists
                 elif user.is_staff:
                     return redirect('home')  # Redirect to home page for staff users
                 else:
-                    return redirect('index')  # Redirect to a different page for non-staff users
+                    return redirect('index')  # Redirect to patient dashboard or home for non-staff users
             else:
                 return render(request, 'cms/login.html', {'form': form, 'error': 'Invalid username or password'})
     else:
@@ -96,8 +98,10 @@ def register(request):
                 elif User.objects.filter(email=email).exists():
                     messages.error(request, 'Email already exists')
                 else:
+                    # Create and save the user
                     user = User.objects.create_user(username=username, email=email, password=password)
                     user.save()
+
                     messages.success(request, 'Registration successful! Please log in.')
                     return redirect('login')
             else:

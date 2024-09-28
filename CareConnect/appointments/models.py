@@ -18,7 +18,7 @@ class Appointment(models.Model):
     )
     id = models.AutoField(primary_key=True)
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null=True)
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null=True,related_name='appointments')
     specialty = models.ForeignKey(Speciality, on_delete=models.CASCADE, null=True)
     symptom_description = models.TextField(default='', blank=True)
     appointment_date = models.DateField(null=True)

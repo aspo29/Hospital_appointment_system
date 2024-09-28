@@ -14,52 +14,69 @@ from xhtml2pdf import pisa
 from django.conf import settings
 import os
 # Create your views here.
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import Patient, Appointment, Doctor, Speciality
 
+
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from .models import Patient, Appointment, Doctor, Speciality
+from .forms import  AppointmentForm
+from patients.forms import PatientForm
+
+@login_required
 def book_appointment(request):
-    if not request.user.is_authenticated and request.user.is_staff:
-        return redirect('login')
+    # Attempt to fetch the existing Patient instance for the logged-in user
+    patient = Patient.objects.filter(user=request.user).first()
 
     if request.method == 'POST':
-        patient_form = PatientForm(request.POST)
+        # Get the forms with the POST data
+        patient_form = PatientForm(request.POST, instance=patient)  # Link the form to the existing patient if it exists
         appointment_form = AppointmentForm(request.POST, show_patient_field=False)
-        
-        if patient_form.is_valid() and appointment_form.is_valid():
-            patient = patient_form.save()
-            
-            doctor = appointment_form.cleaned_data['doctor']
-            specialty = appointment_form.cleaned_data['specialty']
-            appointment_date = appointment_form.cleaned_data['appointment_date']
-            appointment_time = appointment_form.cleaned_data['appointment_time']
-            symptom_description = appointment_form.cleaned_data['symptom_description']
-            
-            appointment = Appointment(
-                patient=patient,
-                doctor=doctor,
-                specialty=specialty,
-                appointment_date=appointment_date,
-                appointment_time=appointment_time,
-                symptom_description=symptom_description
-            )
-            appointment.save()
-        
-            messages.success(request, 'You will soon receive a contact from the hospital.')
 
-            request.session['appointment_id'] = appointment.id
-            
+        # First, validate the appointment form
+        if appointment_form.is_valid():
+            # Now create or update the patient profile if necessary
+            if not patient:
+                # If no patient exists, create a new Patient instance
+                if patient_form.is_valid():
+                    patient = patient_form.save(commit=False)
+                    patient.user = request.user  # Link patient to the logged-in user
+                    patient.save()  # Save the new patient
+                    messages.success(request, "Patient profile created successfully.")
+                else:
+                    messages.error(request, "Invalid patient information.")
+                    return render(request, 'appointments/book_appointment.html', {
+                        'patient_form': patient_form,
+                        'appointment_form': appointment_form,
+                    })
+
+            # Now associate the appointment with the patient
+            appointment = appointment_form.save(commit=False)
+            appointment.patient = patient  # Associate the appointment with the patient
+            appointment.save()  # Save the appointment
+
+            messages.success(request, 'Appointment created successfully. You will soon be contacted by the hospital.')
             return redirect('success_view', appointment_id=appointment.id)
-    
+
     else:
+        # Handle GET request
         doctor_id = request.GET.get('doctor_id')
         speciality_id = request.GET.get('speciality_id')
         initial_data = {}
+
         if doctor_id:
             initial_data['doctor'] = Doctor.objects.get(pk=doctor_id)
         if speciality_id:
             initial_data['specialty'] = Speciality.objects.get(pk=speciality_id)
 
-        patient_form = PatientForm()
-        appointment_form = AppointmentForm(initial=initial_data, show_patient_field=False)
-    
+        # Instantiate the patient form with existing patient details if available
+        patient_form = PatientForm(instance=patient)  # Link to existing patient if exists
+        appointment_form = AppointmentForm(initial=initial_data, show_patient_field=False)  # Populate with initial data if available
+
     context = {
         'patient_form': patient_form,
         'appointment_form': appointment_form,
@@ -68,49 +85,66 @@ def book_appointment(request):
     }
     return render(request, 'appointments/book_appointment.html', context)
 
+@login_required
 def book_another_appointment(request):
-    if not request.user.is_authenticated:
-        return redirect('login')
-    
+    # Retrieve the patient's latest appointment
+    patient = Patient.objects.filter(user=request.user).first()
+
+    if not patient:
+        messages.error(request, 'No patient found. Please book your first appointment.')
+        return redirect('book_appointment')
+
+    # Extract doctor_id and speciality_id from query parameters
+    doctor_id = request.GET.get('doctor_id')
+    speciality_id = request.GET.get('speciality_id')
+
+    # Try to retrieve the doctor and specialty from the database
+    doctor = Doctor.objects.filter(id=doctor_id).first() if doctor_id else None
+    specialty = Speciality.objects.filter(id=speciality_id).first() if speciality_id else None
+
     if request.method == 'POST':
-        patient_name = request.POST.get('patient_name')
-        try:
-            patient = Patient.objects.get(name=patient_name)
-        except Patient.DoesNotExist:
-            messages.error(request, 'Patient not found. Please create a new appointment.')
-            return redirect('book_appointment')
-
         appointment_form = AppointmentForm(request.POST, show_patient_field=False)
+
         if appointment_form.is_valid():
-            doctor = appointment_form.cleaned_data['doctor']
-            specialty = appointment_form.cleaned_data['specialty']
-            appointment_date = appointment_form.cleaned_data['appointment_date']
-            appointment_time = appointment_form.cleaned_data['appointment_time']
-            symptom_description = appointment_form.cleaned_data['symptom_description']
+            appointment = appointment_form.save(commit=False)
+            appointment.patient = patient  # Associate the patient with the appointment
 
-            appointment = Appointment(
+            # If doctor and specialty were passed in the URL, set them
+            if doctor:
+                appointment.doctor = doctor
+            if specialty:
+                appointment.specialty = specialty
+
+            # Check for conflicting appointments for the same patient at the same time
+            existing_appointments = Appointment.objects.filter(
                 patient=patient,
-                doctor=doctor,
-                specialty=specialty,
-                appointment_date=appointment_date,
-                appointment_time=appointment_time,
-                symptom_description=symptom_description
+                appointment_date=appointment.appointment_date,
+                appointment_time=appointment.appointment_time
             )
-            appointment.save()
+            
+            if existing_appointments.exists():
+                messages.error(request, 'You already have an appointment at this time.')
+            else:
+                # Save the new appointment if there is no conflict
+                appointment.save()
+                messages.success(request, 'Appointment created successfully. You will soon be contacted by the hospital.')
+                return redirect('success_view', appointment_id=appointment.id)
 
-            messages.success(request, 'You will soon receive a contact from the hospital.')
-
-            request.session['appointment_id'] = appointment.id
-
-            return redirect('success_view', appointment_id=appointment.id)
     else:
-        appointment_form = AppointmentForm(show_patient_field=False)
+        # Pre-populate the form with doctor and specialty if available
+        initial_data = {}
+        if doctor:
+            initial_data['doctor'] = doctor
+        if specialty:
+            initial_data['specialty'] = specialty
+        
+        appointment_form = AppointmentForm(show_patient_field=False, initial=initial_data)
 
     context = {
         'appointment_form': appointment_form,
+        'patient_name': patient.name,  # Send the patient name to the template
     }
     return render(request, 'appointments/book_another_appointment.html', context)
-
 
 # List appointments
 def appointment_list(request):
@@ -120,14 +154,13 @@ def appointment_list(request):
     context = {'appointments': appointments}
     return render(request, 'appointments/appointment_list.html', context)
 
+DEFAULT_PATIENT_ID = 1  # Make sure to set this appropriately in your settings or context
 
-DEFAULT_PATIENT_ID = 1
-# Add appointment
+@login_required
 def add_appointment(request):
     if not request.user.is_staff:
-        return redirect('login')
-
-    default_patient = Patient.objects.get(pk=DEFAULT_PATIENT_ID)
+        messages.error(request, 'You do not have permission to access this page.')
+        return redirect('profile')
 
     if request.method == 'POST':
         form = AppointmentForm(request.POST)
@@ -137,9 +170,14 @@ def add_appointment(request):
             appointment_date = form.cleaned_data['appointment_date']
             appointment_time = form.cleaned_data['appointment_time']
             symptom_description = form.cleaned_data['symptom_description']
-            
+
+            # Get the patient ID from the form data (make sure to include this in your form)
+            patient_id = request.POST.get('patient_id')
+            patient = get_object_or_404(Patient, id=patient_id)
+
+            # Create the appointment
             appointment = Appointment(
-                patient=default_patient,  
+                patient=patient,
                 doctor=doctor,
                 specialty=specialty,
                 appointment_date=appointment_date,
@@ -151,40 +189,83 @@ def add_appointment(request):
             return redirect('appointment_list')
     else:
         form = AppointmentForm()
-    
-    return render(request, 'appointments/add_appointment.html', {'form': form})
 
-# Delete appointment
-def delete_appointment(request, appointment_id):
-    if not request.user.is_staff:
-        return redirect('login')
-    
-    appointment = get_object_or_404(Appointment, pk=appointment_id)
-    
-    if request.method == 'POST':
-        appointment.delete()
-        messages.success(request, 'Appointment deleted successfully.')
-        return redirect('appointment_list')
+    # Get all patients for the admin to select from
+    patients = Patient.objects.all()
+    return render(request, 'appointments/add_appointment.html', {'form': form, 'patients': patients})
 
-    return render(request, 'appointments/appointment_list.html', {'appointment': appointment})
+# # Delete appointment
+# def delete_appointment(request, appointment_id):
+#     if not request.user.is_staff:
+#         return redirect('login')
+    
+#     appointment = get_object_or_404(Appointment, pk=appointment_id)
+    
+#     if request.method == 'POST':
+#         appointment.delete()
+#         messages.success(request, 'Appointment deleted successfully.')
+#         return redirect('appointment_list')
 
+#     return render(request, 'appointments/appointment_list.html', {'appointment': appointment})
+
+# def update_appointment(request, appointment_id):
+#     if not request.user.is_staff:
+#         return redirect('login')
+#     default_patient = Patient.objects.get(pk=DEFAULT_PATIENT_ID)
+
+#     appointment = get_object_or_404(Appointment, id=appointment_id)
+#     if request.method == 'POST':
+#         form = AppointmentForm(request.POST, instance=appointment)
+#         if form.is_valid():
+#             form.save()
+#             messages.success(request, 'Appointment updated successfully.')
+#             return redirect('appointment_list')
+#     else:
+#         form = AppointmentForm(instance=appointment)
+#     return render(request, 'appointments/update_appointment.html', {'form': form, 'appointment': appointment})
+@login_required
 def update_appointment(request, appointment_id):
-    if not request.user.is_staff:
-        return redirect('login')
-    default_patient = Patient.objects.get(pk=DEFAULT_PATIENT_ID)
-
     appointment = get_object_or_404(Appointment, id=appointment_id)
+
+    # If the user is not an admin, check if they are the patient associated with the appointment
+    if not request.user.is_staff and appointment.patient.user != request.user:
+        messages.error(request, 'You do not have permission to edit this appointment.')
+        return redirect('profile')
+
     if request.method == 'POST':
         form = AppointmentForm(request.POST, instance=appointment)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Appointment updated successfully.')
-            return redirect('appointment_list')
+            if request.user.is_staff:
+                messages.success(request, 'Appointment updated successfully.')
+                return redirect('appointment_list')
+            else:
+                messages.success(request, 'Your appointment has been updated successfully.')
+                return redirect('profile')
     else:
         form = AppointmentForm(instance=appointment)
+
     return render(request, 'appointments/update_appointment.html', {'form': form, 'appointment': appointment})
 
 @login_required
+def delete_appointment(request, appointment_id):
+    appointment = get_object_or_404(Appointment, pk=appointment_id)
+
+    # Check permissions
+    if not request.user.is_staff and appointment.patient.user != request.user:
+        messages.error(request, 'You do not have permission to delete this appointment.')
+        return redirect('profile')
+
+    # Handle the deletion if the request is a POST
+    if request.method == 'POST':
+        appointment.delete()
+        messages.success(request, 'Appointment deleted successfully.')
+        # Redirect based on user type
+        return redirect('appointment_list' if request.user.is_staff else 'profile')
+
+    # Render confirmation template for GET request
+    return render(request, 'appointments/confirm_delete.html', {'appointment': appointment})
+
 def success_view(request, appointment_id):
     if not appointment_id:
         raise Http404("Appointment ID not provided")
@@ -198,12 +279,11 @@ def success_view(request, appointment_id):
         context = {} 
     return render(request, 'appointments/success.html', context)
 
-def ticket(request):
-    if 'appointment_id' not in request.session:
-        return HttpResponse('Appointment ID not found in session.')
-
-    appointment_id = request.session['appointment_id']
-    appointment = Appointment.objects.get(pk=appointment_id)
+def ticket(request, appointment_id):
+    try:
+        appointment = Appointment.objects.get(pk=appointment_id)
+    except Appointment.DoesNotExist:
+        return HttpResponse('Appointment not found.')
 
     # Generate token
     year_last_two = str(appointment.appointment_date.year)[-2:]  

@@ -22,11 +22,13 @@
                 <h1 class="mt-3">Appointment Successfully Booked!</h1>
                 <p class="lead">Thank you for booking your appointment with us.</p>
                 {% if appointment %}
-                <p>Your appointment is booked with <b style="font-weight: bold;">{{appointment.doctor.name }}</b> <br>on <b style="font-weight: bold;">{{ appointment.appointment_date }}</b> between <b style="font-weight: bold;">{{ appointment.time }}</b></p>
+                <p>Your appointment is booked with <b style="font-weight: bold;">{{appointment.doctor.name }}</b> <br>on
+                    <b style="font-weight: bold;">{{ appointment.appointment_date }}</b> between <b
+                        style="font-weight: bold;">{{ appointment.time }}</b></p>
                 {% endif %}
             </div>
             <div class="text-center mt-5">
-                <form action="{% url 'ticket' %}" method="post" target="_blank">
+                <form action="{% url 'ticket' appointment.id %}" method="post" target="_blank">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-primary">Download Ticket</button>
                 </form>

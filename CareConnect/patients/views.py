@@ -1,7 +1,9 @@
 from django.shortcuts import render , redirect ,get_object_or_404
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import  PatientForm
 from .models import Patient 
+from appointments.models import Appointment
 
 # Create your views here.
 # Patient views
@@ -12,16 +14,24 @@ def patient_list(request):
     context = {'patients': patients}
     return render(request, 'patients/patient_list.html', context)
 
+@login_required
 def delete_patient(request, patient_id):
-    if not request.user.is_staff:
+    if not request.user.is_staff:  # Ensure only staff can delete a patient
         return redirect('login')
-    
+
     patient = get_object_or_404(Patient, pk=patient_id)
-    
+
     if request.method == 'POST':
-        patient.delete()
-        messages.success(request, 'Patient deleted successfully.')
-    return redirect('patient_list')
+        # Delete all appointments related to the patient
+        Appointment.objects.filter(patient=patient).delete()
+
+        # Delete the associated user account
+        user = patient.user
+        patient.delete()  # Delete the patient profile
+        user.delete()     # Delete the user account
+        
+        messages.success(request, 'Patient and associated user account deleted successfully.')
+        return redirect('patient_list')  # Redirect to the patient list after deletion
 
 def add_patient(request):
     if not request.user.is_staff:

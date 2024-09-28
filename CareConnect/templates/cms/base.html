@@ -49,7 +49,7 @@
 
 <body>
     <header class="header_section sticky-top">
-        <nav class="navbar navbar-expand-lg navbar-light bg-light ">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container">
                 <a class="navbar-brand" href="/">
                     {% if logo %}
@@ -67,30 +67,29 @@
                     </div>
                     <div class="offcanvas-body">
                         <ul class="navbar-nav mx-auto mt-2 mt-lg-0">
+                            {% if user.is_authenticated %}
+                            {% if request.user.is_staff %}
                             <li class="nav-item">
-                                {% if user.is_authenticated %}
-                                {% if request.user.is_staff %}
                                 <a class="nav-link" href="{% url 'home' %}">Dashboard</a>
+                            </li>
+                            <!-- Staff-specific sections -->
                             <li class="nav-item">
                                 <div class="dropdown">
                                     <a class="nav-link dropdown-toggle" type="button" id="appointmentDropdown"
-                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                        Appointments
-                                    </a>
+                                        data-bs-toggle="dropdown" aria-expanded="false">Appointments</a>
                                     <ul class="dropdown-menu" aria-labelledby="appointmentDropdown">
                                         <li><a class="dropdown-item" href="{% url 'appointment_list' %}">View
                                                 Appointments</a></li>
                                         <li><a class="dropdown-item" href="{% url 'add_appointment' %}">Add
-                                                Appointment</a></li>
+                                                Appointment</a>
+                                        </li>
                                     </ul>
                                 </div>
                             </li>
                             <li class="nav-item">
                                 <div class="dropdown">
                                     <a class="nav-link dropdown-toggle" type="button" id="doctorDropdown"
-                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                        Doctors
-                                    </a>
+                                        data-bs-toggle="dropdown" aria-expanded="false">Doctors</a>
                                     <ul class="dropdown-menu" aria-labelledby="doctorDropdown">
                                         <li><a class="dropdown-item" href="{% url 'doctor_list' %}">Doctor List</a></li>
                                         <li><a class="dropdown-item" href="{% url 'add_doctor' %}">Add Doctor</a></li>
@@ -100,9 +99,7 @@
                             <li class="nav-item">
                                 <div class="dropdown">
                                     <a class="nav-link dropdown-toggle" type="button" id="patientDropdown"
-                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                        Patients
-                                    </a>
+                                        data-bs-toggle="dropdown" aria-expanded="false">Patients</a>
                                     <ul class="dropdown-menu" aria-labelledby="patientDropdown">
                                         <li><a class="dropdown-item" href="{% url 'patient_list' %}">Patient List</a>
                                         </li>
@@ -113,31 +110,54 @@
                             <li class="nav-item">
                                 <div class="dropdown">
                                     <a class="nav-link dropdown-toggle" type="button" id="specialtyDropdown"
-                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                        Specialty
-                                    </a>
+                                        data-bs-toggle="dropdown" aria-expanded="false">Specialty</a>
                                     <ul class="dropdown-menu" aria-labelledby="specialtyDropdown">
                                         <li><a class="dropdown-item" href="{% url 'specialty_list' %}">Specialty
-                                                List</a></li>
+                                                List</a>
+                                        </li>
                                         <li><a class="dropdown-item" href="{% url 'add_specialty' %}">Add Specialty</a>
                                         </li>
                                     </ul>
                                 </div>
                             </li>
+                            {% else %}
+                            <!-- Normal User Navbar -->
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'index' %}">Home</a>
+                            </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'find_doctors' %}">Find Doctors</a>
                             </li>
+
+                            {% if request.user.is_authenticated %}
+
+                            {% with request.user.patient as patient %}
+                            {% if patient %}
+                            {% with patient.appointments.all as appointments %}
+                            {% if appointments.count > 0 %}
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'book_appointment' %}">Book Appointment</a>
+                                <a class="nav-link" href="{% url 'book_another_appointment' %}">Book Another
+                                    Appointment</a>
                             </li>
                             {% else %}
-                            <a class="nav-link" href="{% url 'index' %}">Home</a>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'find_doctors' %}">Find Doctors</a>
-                            </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'book_appointment' %}">Book Appointment</a>
                             </li>
+                            {% endif %}
+                            {% endwith %}
+                            {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'book_appointment' %}">Book Appointment</a>
+                            </li>
+                            {% endif %}
+                            {% endwith %}
+
+                            {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'login' %}">Login to Book Appointment</a>
+                            </li>
+                            {% endif %}
+
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'about_us' %}">About Us</a>
                             </li>
@@ -146,14 +166,17 @@
                             </li>
                             {% endif %}
                             {% else %}
-                            <a class="nav-link" href="{% url 'index' %}">Home</a>
+                            <!-- Guest User Navbar -->
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'index' %}">Home</a>
+                            </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'find_doctors' %}">Find Doctors</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{% url 'login' %}">
                                     <span class="nav-link-text"
-                                        onclick="alert('Please login or register to book appointment.')">Book
+                                        onclick="alert('Please login or register to book an appointment.')">Book
                                         Appointment</span>
                                 </a>
                             </li>
@@ -164,24 +187,27 @@
                                 <a class="nav-link" href="{% url 'contact_us' %}">Contact Us</a>
                             </li>
                             {% endif %}
-                            </li>
                         </ul>
 
-                        <div class="ml-auto">
+                        <div class="ml-auto d-flex align-items-center">
                             {% if user.is_authenticated %}
+                            <a href="{% url 'profile' %}" class="btn btn-outline-success rounded-pill mx-2">Profile</a>
                             {% if user.is_staff %}
-                            <form method="POST" action="{% url 'logout_admin' %}">
+                            <form method="POST" action="{% url 'logout_admin' %}" class="mb-0">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-primary my-2 my-sm-0 mr-2">Logout</button>
                             </form>
                             {% else %}
-                            <form method="POST" action="{% url 'logout_user' %}">
+                            <form method="POST" action="{% url 'logout_user' %}" class="mb-0">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-primary my-2 my-sm-0 mr-2">Logout</button>
                             </form>
                             {% endif %}
                             {% else %}
-                            <a href="{% url 'login' %}" class="btn btn-primary my-2 my-sm-0 mr-2">Login</a>
+                            <form method="POST" action="{% url 'login' %}" class="mb-0">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary my-2 my-sm-0 mx-2">Login</button>
+                            </form>
                             <a href="{% url 'register' %}" class="btn btn-outline-primary my-2 my-sm-0">Sign Up</a>
                             {% endif %}
                         </div>
@@ -191,7 +217,6 @@
             </div>
         </nav>
     </header>
-
 
     <main>
         {% block content %}

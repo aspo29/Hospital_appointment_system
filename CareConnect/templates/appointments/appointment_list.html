@@ -24,6 +24,7 @@
                 <th>Appointment Date</th>
                 <th>Appointment Time</th>
                 <th>Action</th>
+                <th>Ticket</th>
             </tr>
         </thead>
         <tbody>
@@ -69,6 +70,15 @@
                         </div>
                     </div>
                 </td>
+                <td>
+                    <a href="{% url 'ticket' appointment.id %}" class="btn btn-primary" target="_blank">
+                        <i class="fas fa-ticket-alt"></i> Download Ticket
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center">No appointments found.</td>
             </tr>
             {% endfor %}
         </tbody>

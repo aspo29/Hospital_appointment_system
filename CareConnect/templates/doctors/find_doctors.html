@@ -1,4 +1,3 @@
-<!-- find_doctors.html -->
 {% extends 'cms/base.html' %}
 
 {% block title %}Find Doctors - Care Connect{% endblock %}
@@ -30,13 +29,22 @@
                     <div class="card-body">
                         <h5 class="card-title">{{ doc.name }}</h5>
                         <p class="card-text">{{ doc.profession }}</p>
-                        {% if request.user.is_authenticated or request.user.is_staff %}
+
+                        {% if user.is_authenticated %}
+                        {% if not user.is_staff %}
+                        {% if has_appointment %}
+                        <a href="{% url 'book_another_appointment' %}?doctor_id={{ doc.id }}&speciality_id={{ doc.profession.speciality.id }}"
+                            class="btn btn-primary">Book Another Appointment</a>
+                        {% else %}
                         <a href="{% url 'book_appointment' %}?doctor_id={{ doc.id }}&speciality_id={{ doc.profession.speciality.id }}"
                             class="btn btn-primary">Book Appointment</a>
+                        {% endif %}
+                        {% endif %}
                         {% else %}
                         <a href="{% url 'login' %}?next={% url 'book_appointment' %}%3Fdoctor_id%3D{{ doc.id }}%26speciality_id%3D{{ doc.profession.speciality.id }}"
-                            class="btn btn-primary" onclick="alert('Please login or register to book appointment.')">
-                            Login to Book</a>
+                            class="btn btn-primary" onclick="alert('Please login or register to book an appointment.')">
+                            Login to Book
+                        </a>
                         {% endif %}
                     </div>
                 </div>
@@ -47,7 +55,7 @@
 </div>
 <script>
     function searchCards(event) {
-        event.preventDefault();// Prevent form submission
+        event.preventDefault(); // Prevent form submission
         var query = document.getElementById('search-query').value.trim().toLowerCase();
         var cards = document.querySelectorAll('.col-md-4.mb-4');
 

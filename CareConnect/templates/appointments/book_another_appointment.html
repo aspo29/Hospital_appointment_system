@@ -6,13 +6,28 @@
 {% block content %}
 <div class="container my-5 p-4 shadow-lg rounded-4">
     <h2 class="text-center text-primary my-4 text-shadow">Book Another Appointment</h2>
+
+    <!-- Alert for session or message -->
+    {% if messages %}
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+        {% for message in messages %}
+        {{ message }}
+        {% endfor %}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
     <form method="post">
         {% csrf_token %}
         <div class="mb-3">
             <label for="patient_name" class="form-label">Patient Name</label>
-            <input type="text" class="form-control" id="patient_name" name="patient_name" required>
+            <input type="text" class="form-control" id="patient_name" name="patient_name" value="{{ patient_name }}"
+                readonly>
         </div>
+
+        <!-- Render the appointment form fields -->
         {{ appointment_form.as_p }}
+
         <button type="submit" class="btn btn-primary">Book Appointment</button>
     </form>
 </div>
