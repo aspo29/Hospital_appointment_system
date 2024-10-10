@@ -19,6 +19,12 @@
     <style>
         body {
             font-family: 'Roboto', sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .main{
+            flex: 1;
         }
 
         h1,
@@ -47,7 +53,7 @@
     </style>
 </head>
 
-<body>
+<body class="d-flex flex-column min-vh-100">
     <header class="header_section sticky-top">
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container">
@@ -218,7 +224,7 @@
         </nav>
     </header>
 
-    <main>
+    <main class="main flex-grow-1">
         {% block content %}
         {% endblock %}
     </main>
