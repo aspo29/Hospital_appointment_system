@@ -1,0 +1,34 @@
+{% extends 'cms/base.html' %}
+
+{% block title %}Payment - Care Connect{% endblock %}
+
+{% block content %}
+    {% if messages %}
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+        {% for message in messages %}
+        {{ message }}
+        {% endfor %}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+    <!-- templates/checkout.html -->
+    <form action="https://rc-epay.esewa.com.np/api/epay/main/v2/form" method="POST">
+        {% csrf_token %}
+        <input type="hidden" name="amount" value="{{ price }}" required>
+        <input type="hidden" name="tax_amount" value="{{ tax_amount }}" required>
+        <input type="hidden" name="total_amount" value="{{ total_amount }}" required>
+        <input type="hidden" name="transaction_uuid" value="{{ transaction_uuid }}" required>
+        <input type="hidden" name="product_code" value="{{ payment_code }}" required>
+        <input type="hidden" name="product_service_charge" value="0" required>
+        <input type="hidden" name="product_delivery_charge" value="0" required>
+        <input type="hidden" name="success_url" value="http://localhost:8000/payment/successes" required>
+        <input type="hidden" name="failure_url" value="http://localhost:8000/payment/failure" required>
+        <input type="hidden" name="signed_field_names" value="total_amount,transaction_uuid,product_code" required>
+        <input type="hidden" name="signature" value="{{ signature }}" required>
+        <input type="submit" value="Pay with eSewa"
+            style="display:block !important; background-color: #60bb46; cursor: pointer; color: #fff; border: none; padding: 5px 10px;">
+    </form>
+</body>
+
+</html>
+{% endblock %}

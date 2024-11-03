@@ -11,16 +11,18 @@ def find_doctors(request, speciality_id=None):
     else:
         doctors = Doctor.objects.all()
 
-    is_authenticated = request.user.is_authenticated
-    is_staff = request.user.is_staff
-    has_appointment = request.session.get('appointment_id') is not None  # Check for existing appointment
+    has_appointment = (
+        request.user.is_authenticated and 
+        hasattr(request.user, 'patient') and 
+        request.user.patient.appointments.exists()
+    )
 
     return render(request, 'doctors/find_doctors.html', {
         'doctors': doctors,
         'selected_speciality_id': speciality_id,
-        'is_authenticated': is_authenticated,
-        'is_staff': is_staff,
-        'has_appointment': has_appointment,  # Pass this variable to the template
+        'is_authenticated': request.user.is_authenticated,
+        'is_staff': request.user.is_staff,
+        'has_appointment': has_appointment, 
     })
 
 # Doctor views

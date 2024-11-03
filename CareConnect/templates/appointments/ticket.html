@@ -11,6 +11,7 @@
     <div class="container">
         <h5><strong>APPOINTMENT TICKET</strong></h5>
         <p>Token no: {{ token }}</p>
+        <p>Price:NPR {{ appointment.get_price_in_npr }}</p>
         <p>Patient: {{ appointment.patient.name }}</p>
         <p>Appointment Date: {{ appointment.appointment_date }}</p>
         <p>Appointment Time: {{ appointment.time }}</p>

@@ -16,6 +16,11 @@ class Appointment(models.Model):
         (7, '16:00 – 17:00'),
         (8, '17:00 – 18:00'),
     )
+    PRICE_CATEGORY_CHOICES = [
+        (1, "Standard - NPR 500"),
+        (2, "Premium - NPR 1000"),
+        (3, "VIP - NPR 1500"),
+    ]
     id = models.AutoField(primary_key=True)
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE, null=True,related_name='appointments')
@@ -23,6 +28,7 @@ class Appointment(models.Model):
     symptom_description = models.TextField(default='', blank=True)
     appointment_date = models.DateField(null=True)
     appointment_time = models.IntegerField(choices=TIME_LIST, null=True)
+    price_category = models.IntegerField(choices=PRICE_CATEGORY_CHOICES, default=1)
 
     def __str__(self):
         return f'Appointment with Dr. {self.doctor.name} for {self.patient.name} on {self.appointment_date} at {self.time}'
@@ -42,3 +48,7 @@ class Appointment(models.Model):
         if self.appointment_time is not None:
             return self.TIME_LIST[self.appointment_time][1]
         return None
+    
+    def get_price_in_npr(self):
+        price_mapping = {1: 500, 2: 1000, 3: 1500}
+        return price_mapping.get(self.price_category, 500)

@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect ,get_object_or_404
+from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.http import Http404 , HttpResponse, HttpResponseRedirect ,JsonResponse
 from django.template.loader import render_to_string
@@ -59,23 +60,38 @@ def book_appointment(request):
             appointment.patient = patient  # Associate the appointment with the patient
             appointment.save()  # Save the appointment
 
-            messages.success(request, 'Appointment created successfully. You will soon be contacted by the hospital.')
-            return redirect('success_view', appointment_id=appointment.id)
-
+            # messages.success(request, 'Appointment created successfully. You will soon be contacted by the hospital.')
+            # request.session.pop('appointment_form_data', None)
+            # request.session.pop('patient_form_data', None)
+            # return redirect('success_view', appointment_id=appointment.id)
+            # Display success message
+            # Store appointment ID in session
+            messages.success(request, 'Appointment created successfully. You will be redirected to checkout.')
+            # Redirect to checkout page in the payment app with patient ID and price
+            return redirect(reverse('payment:checkout', args=[appointment.patient.id, appointment.get_price_in_npr()]))
+        else:
+            # Save form data to session if not valid
+            request.session['appointment_form_data'] = request.POST
+            request.session['patient_form_data'] = request.POST
     else:
-        # Handle GET request
-        doctor_id = request.GET.get('doctor_id')
-        speciality_id = request.GET.get('speciality_id')
-        initial_data = {}
+        # Pre-populate forms with session data if available
+        appointment_form_data = request.session.get('appointment_form_data')
+        patient_form_data = request.session.get('patient_form_data')
+        
+        if appointment_form_data:
+            appointment_form = AppointmentForm(appointment_form_data, show_patient_field=False)
+        else:
+            initial_data = {}
+            if doctor_id := request.GET.get('doctor_id'):
+                initial_data['doctor'] = Doctor.objects.get(pk=doctor_id)
+            if speciality_id := request.GET.get('speciality_id'):
+                initial_data['specialty'] = Speciality.objects.get(pk=speciality_id)
+            appointment_form = AppointmentForm(initial=initial_data, show_patient_field=False)
 
-        if doctor_id:
-            initial_data['doctor'] = Doctor.objects.get(pk=doctor_id)
-        if speciality_id:
-            initial_data['specialty'] = Speciality.objects.get(pk=speciality_id)
-
-        # Instantiate the patient form with existing patient details if available
-        patient_form = PatientForm(instance=patient)  # Link to existing patient if exists
-        appointment_form = AppointmentForm(initial=initial_data, show_patient_field=False)  # Populate with initial data if available
+        if patient_form_data:
+            patient_form = PatientForm(patient_form_data)
+        else:
+            patient_form = PatientForm(instance=patient)
 
     context = {
         'patient_form': patient_form,
@@ -87,62 +103,66 @@ def book_appointment(request):
 
 @login_required
 def book_another_appointment(request):
-    # Retrieve the patient's latest appointment
+    # Retrieve the patient's record based on the logged-in user
     patient = Patient.objects.filter(user=request.user).first()
-
     if not patient:
         messages.error(request, 'No patient found. Please book your first appointment.')
-        return redirect('book_appointment')
+        return redirect('appointment:book_appointment')
 
-    # Extract doctor_id and speciality_id from query parameters
+    # Get doctor and specialty from query parameters if available
     doctor_id = request.GET.get('doctor_id')
     speciality_id = request.GET.get('speciality_id')
-
-    # Try to retrieve the doctor and specialty from the database
     doctor = Doctor.objects.filter(id=doctor_id).first() if doctor_id else None
     specialty = Speciality.objects.filter(id=speciality_id).first() if speciality_id else None
 
+    # Check if this is a POST request to process form data
     if request.method == 'POST':
         appointment_form = AppointmentForm(request.POST, show_patient_field=False)
-
+        
         if appointment_form.is_valid():
             appointment = appointment_form.save(commit=False)
-            appointment.patient = patient  # Associate the patient with the appointment
+            appointment.patient = patient
 
-            # If doctor and specialty were passed in the URL, set them
+            # Set doctor and specialty if provided in the query parameters
             if doctor:
                 appointment.doctor = doctor
             if specialty:
                 appointment.specialty = specialty
 
-            # Check for conflicting appointments for the same patient at the same time
+            # Check for time conflicts with other appointments for the same patient
             existing_appointments = Appointment.objects.filter(
                 patient=patient,
                 appointment_date=appointment.appointment_date,
                 appointment_time=appointment.appointment_time
             )
-            
             if existing_appointments.exists():
                 messages.error(request, 'You already have an appointment at this time.')
             else:
-                # Save the new appointment if there is no conflict
+                # Save the appointment and proceed to checkout
                 appointment.save()
-                messages.success(request, 'Appointment created successfully. You will soon be contacted by the hospital.')
-                return redirect('success_view', appointment_id=appointment.id)
+                messages.success(request, 'Appointment created successfully. You will be redirected to checkout.')
+                
+                # Redirect to checkout with patient ID and price
+                return redirect(reverse('payment:checkout', args=[appointment.patient.id, appointment.get_price_in_npr()]))
+        else:
+            # Save form data in session if there are errors, so it can be restored
+            request.session['appointment_form_data'] = request.POST
 
     else:
-        # Pre-populate the form with doctor and specialty if available
+        # Load form data from session or initialize with doctor and specialty data
         initial_data = {}
         if doctor:
             initial_data['doctor'] = doctor
         if specialty:
             initial_data['specialty'] = specialty
-        
-        appointment_form = AppointmentForm(show_patient_field=False, initial=initial_data)
 
+        appointment_form_data = request.session.get('appointment_form_data')
+        appointment_form = AppointmentForm(appointment_form_data or None, show_patient_field=False, initial=initial_data)
+
+    # Prepare the context for rendering the template
     context = {
         'appointment_form': appointment_form,
-        'patient_name': patient.name,  # Send the patient name to the template
+        'patient_name': patient.name,
     }
     return render(request, 'appointments/book_another_appointment.html', context)
 

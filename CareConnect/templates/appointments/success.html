@@ -28,7 +28,7 @@
                 {% endif %}
             </div>
             <div class="text-center mt-5">
-                <form action="{% url 'ticket' appointment.id %}" method="post" target="_blank">
+                <form action="{% url 'appointment:ticket' appointment.id %}" method="post" target="_blank">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-primary">Download Ticket</button>
                 </form>

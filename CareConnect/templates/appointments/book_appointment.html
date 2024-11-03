@@ -17,7 +17,7 @@
     <h2 class="text-center text-primary my-4 text-shadow">BOOK YOUR APPOINTMENT</h2>
 
     <!-- Patient Information Form -->
-    <form method="post" action="{% url 'book_appointment' %}" class="row g-3">
+    <form method="post" action="{% url 'appointment:book_appointment' %}" class="row g-3">
         {% csrf_token %}
         <h3 class="my-2 text-success">Patient Information</h3>
 
@@ -57,16 +57,21 @@
             {{ appointment_form.specialty }}
         </div>
 
-        <div class="col-md-6">
+        <div class="col-md-4">
             {{ appointment_form.appointment_date.label_tag }}
             <div class="input-group">
                 {{ appointment_form.appointment_date }}
             </div>
         </div>
 
-        <div class="col-md-6">
+        <div class="col-md-4">
             {{ appointment_form.appointment_time.label_tag }}
             {{ appointment_form.appointment_time }}
+        </div>
+        
+        <div class="col-md-4">
+            {{ appointment_form.price_category.label_tag }}
+            {{ appointment_form.price_category }}
         </div>
 
         <div class="col-md-12">
@@ -94,7 +99,7 @@
 
         <div class="col-md-12 d-flex justify-content-between">
             <button type="submit" class="btn btn-primary">Book Appointment</button>
-            <!-- <a href="{% url 'book_another_appointment' %}" class="btn btn-secondary">Make Another Appointment</a> -->
+            <!-- <a href="{% url 'appointment:book_another_appointment' %}" class="btn btn-secondary">Make Another Appointment</a> -->
         </div>
     </form>
 </div>

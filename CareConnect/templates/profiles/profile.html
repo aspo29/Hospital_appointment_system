@@ -173,6 +173,7 @@
                         <th>Specialty</th>
                         <th>Date</th>
                         <th>Time</th>
+                        <th>Price</th>
                         <th>Actions</th>
                         <th>Ticket</th>
                     </tr>
@@ -184,8 +185,9 @@
                         <td>{{ appointment.specialty.name }}</td>
                         <td>{{ appointment.appointment_date }}</td>
                         <td>{{ appointment.time }}</td>
+                        <td>NPR: {{ appointment.get_price_in_npr }}</td>
                         <td>
-                            <a href="{% url 'update_appointment' appointment.id %}" class="btn btn-warning">Edit</a>
+                            <a href="{% url 'appointment:update_appointment' appointment.id %}" class="btn btn-warning">Edit</a>
                             <button class="btn btn-danger" data-bs-toggle="modal"
                                 data-bs-target="#deleteModal{{ appointment.id }}">Delete</button>
                             <div class="modal fade" id="deleteModal{{ appointment.id }}" tabindex="-1" role="dialog">
@@ -203,7 +205,7 @@
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary"
                                                 data-bs-dismiss="modal">Cancel</button>
-                                            <form action="{% url 'delete_appointment' appointment.id %}" method="post">
+                                            <form action="{% url 'appointment:delete_appointment' appointment.id %}" method="post">
                                                 {% csrf_token %}
                                                 <button type="submit" class="btn btn-danger">Delete</button>
                                             </form>
@@ -213,7 +215,7 @@
                             </div>
                         </td>
                         <td>
-                            <a href="{% url 'ticket' appointment.id %}" class="btn btn-info" title="View Ticket">
+                            <a href="{% url 'appointment:ticket' appointment.id %}" class="btn btn-info" title="View Ticket">
                                 <i class="fas fa-ticket-alt"></i> <!-- Font Awesome ticket icon -->
                             </a>
                         </td>

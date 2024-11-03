@@ -84,9 +84,9 @@
                                     <a class="nav-link dropdown-toggle" type="button" id="appointmentDropdown"
                                         data-bs-toggle="dropdown" aria-expanded="false">Appointments</a>
                                     <ul class="dropdown-menu" aria-labelledby="appointmentDropdown">
-                                        <li><a class="dropdown-item" href="{% url 'appointment_list' %}">View
+                                        <li><a class="dropdown-item" href="{% url 'appointment:appointment_list' %}">View
                                                 Appointments</a></li>
-                                        <li><a class="dropdown-item" href="{% url 'add_appointment' %}">Add
+                                        <li><a class="dropdown-item" href="{% url 'appointment:add_appointment' %}">Add
                                                 Appointment</a>
                                         </li>
                                     </ul>
@@ -142,18 +142,18 @@
                             {% with patient.appointments.all as appointments %}
                             {% if appointments.count > 0 %}
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'book_another_appointment' %}">Book Another
+                                <a class="nav-link" href="{% url 'appointment:book_another_appointment' %}">Book Another
                                     Appointment</a>
                             </li>
                             {% else %}
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'book_appointment' %}">Book Appointment</a>
+                                <a class="nav-link" href="{% url 'appointment:book_appointment' %}">Book Appointment</a>
                             </li>
                             {% endif %}
                             {% endwith %}
                             {% else %}
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'book_appointment' %}">Book Appointment</a>
+                                <a class="nav-link" href="{% url 'appointment:book_appointment' %}">Book Appointment</a>
                             </li>
                             {% endif %}
                             {% endwith %}

@@ -1,0 +1,18 @@
+To use the eSewa SDK in the testing phase, clients/merchants can utilize the following credentials:
+
+eSewa IDs (for testing):
+
+9806800001
+9806800002
+9806800003
+9806800004
+9806800005
+Password:
+
+Nepal@123
+MPIN (for application use only):
+
+1122
+Token:
+
+123456

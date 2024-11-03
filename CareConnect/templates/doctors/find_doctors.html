@@ -33,15 +33,15 @@
                         {% if user.is_authenticated %}
                         {% if not user.is_staff %}
                         {% if has_appointment %}
-                        <a href="{% url 'book_another_appointment' %}?doctor_id={{ doc.id }}&speciality_id={{ doc.profession.speciality.id }}"
+                        <a href="{% url 'appointment:book_another_appointment' %}?doctor_id={{ doc.id }}&speciality_id={{ doc.profession.speciality.id }}"
                             class="btn btn-primary">Book Another Appointment</a>
                         {% else %}
-                        <a href="{% url 'book_appointment' %}?doctor_id={{ doc.id }}&speciality_id={{ doc.profession.speciality.id }}"
+                        <a href="{% url 'appointment:book_appointment' %}?doctor_id={{ doc.id }}&speciality_id={{ doc.profession.speciality.id }}"
                             class="btn btn-primary">Book Appointment</a>
                         {% endif %}
                         {% endif %}
                         {% else %}
-                        <a href="{% url 'login' %}?next={% url 'book_appointment' %}%3Fdoctor_id%3D{{ doc.id }}%26speciality_id%3D{{ doc.profession.speciality.id }}"
+                        <a href="{% url 'login' %}?next={% url 'appointment:book_appointment' %}?doctor_id={{ doc.id }}&speciality_id={{ doc.profession.speciality.id }}"
                             class="btn btn-primary" onclick="alert('Please login or register to book an appointment.')">
                             Login to Book
                         </a>

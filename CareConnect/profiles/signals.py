@@ -12,7 +12,8 @@ def create_profile(sender, instance, created, **kwargs):
 # Save the profile whenever the User object is saved
 @receiver(post_save, sender=User)
 def save_profile(sender, instance, **kwargs):
-    instance.profile.save()
+    if hasattr(instance, 'profile'):
+        instance.profile.save()
 
 # Signal to handle updates in the Profile model
 @receiver(post_save, sender=Profile)

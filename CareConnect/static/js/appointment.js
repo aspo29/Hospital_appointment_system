@@ -2,7 +2,7 @@ $(document).ready(function () {
     $('#id_doctor').change(function () {
         var doctorId = $(this).val();
         $.ajax({
-            url: '/appointments/ajax/get-specialty-by-doctor/',
+            url: '/appointment/ajax/get-specialty-by-doctor/',
             data: {
                 'doctor_id': doctorId
             },
@@ -19,7 +19,7 @@ $(document).ready(function () {
     $('#id_specialty').change(function () {
         var specialtyId = $(this).val();
         $.ajax({
-            url: '/appointments/ajax/get-doctor-by-specialty/',
+            url: '/appointment/ajax/get-doctor-by-specialty/',
             data: {
                 'specialty_id': specialtyId
             },
